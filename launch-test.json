@@ -1,0 +1,24 @@
+{
+    "jobname": "launch-test",
+    "experiments": [
+        {
+            "model": 
+            {
+                "network": "resnet18"
+            },
+            "data": 
+            {
+                "dataset": "CIFAR10"
+            },
+            "optimizer": 
+            {
+                "type": "SGD"
+            },
+            "lr": 
+            {
+                "type": "MultiStepLR"
+            },
+            "num_epochs": 1
+        }
+    ]
+}

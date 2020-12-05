@@ -29,7 +29,7 @@ class Params():
 
     """
 
-    def __init__(self, json_path):
+    def __init__(self, json_path=None):
         with open(json_path) as f:
             params = json.load(f)
             self.__dict__.update(params)
@@ -151,25 +151,6 @@ def save_checkpoint(state, is_best, checkpoint):
         shutil.copyfile(filepath, os.path.join(checkpoint, 'best.pth.zip'))
 
 
-def matplotlib_imshow(img, one_channel=False):
-    """ 
-    helper function to show an image
-
-    Args:
-        img: (tensor) 2D image
-
-    """
-    if one_channel:
-        img = img.mean(dim=0)
-    # un-normalize
-    img = img / 2 + 0.5 
-    npimg = img.numpy()
-    if one_channel:
-        plt.imshow(npimg, cmap='Greys')
-    else:
-        plt.imshow(np.transpose(npimg, (1, 2, 0)))
-
-
 def print_net_summary(log, net, input):
     """ 
     Print the net summary into a log file 
@@ -187,3 +168,42 @@ def print_net_summary(log, net, input):
         summary(net, input_size=tuple(input.size()[1:]))
     sys.stdout = original_stdout
     f.close()
+
+
+def match_dict_by_value(lst, key, value):
+    """
+    match a dict by a specific key-value pair
+
+    Args:
+        lst: (list of dicts) a list of dicts, all contains a common key but may have different values
+        key: (str) common key
+        value: the value used to find the spcific dict
+
+    Returns:
+        dct: (dict) a dictionary element of lst that has the matched key:value pair
+    """
+    for dct in lst:
+        assert isinstance(dct, dict)
+        if key in dct.keys():
+            if dct[key] == value:
+                return dct
+    raise ValueError("key-value pair {}:{} not found in settings {}".format(key, value, lst))
+
+
+def dict_to_list(dct):
+    """
+    put all values in a dictionary (could by 3-level hierarchical) into a list object
+    also convert all elements into str
+    """
+    assert isinstance(dct, dict)
+    lst = []
+    for value in dct.values():
+        if isinstance(value, dict):
+            for val in value.values():
+                if isinstance(val, dict):
+                    lst += [str(v) for v in val.values() if v is not None]
+                else:
+                    lst.append(str(val))
+        else:
+            lst.append(str(value))
+    return lst
